@@ -13,10 +13,12 @@ class TagBot {
         
         this.prefix = [];
         this.mentionPrefix = false;
+        this.status = null
+        this.allowBots = false
+        
         this.user = "";
         
         this.commands = new Map();
-        this.status = null
         
         this.log = () => {};
     }
@@ -37,12 +39,17 @@ class TagBot {
         }
         return this
     }
+    setBotRun(botrun) {
+        this.allowBots = botrun
+        return this
+    }
     
     addCommand(commandName, commandResponse, autoDelete) {
         this.commands.set(commandName, {res: commandResponse, del: autoDelete});
         return this;
     }
     runCommand(commandName, message) {
+        if(!this.allowBots && message.author.bot) return
         let response = this.commands.get(commandName);
         if(!response || !response.res) return;
         this.log(`${message.author.username}#${message.author.discriminator} ran command: ${commandName}`);

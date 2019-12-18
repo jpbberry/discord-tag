@@ -34,6 +34,9 @@ Sets whether or not the bot will treat it's mention as a prefix (Ex: responds to
 ### setStatus(type, game)
 Sets status. Type = 'playing'/'streaming'/'listening'/'watching'. And game is the text after said type.
 
+### setBotRun(botrun)
+Sets whether or not bots can run commands. This is false by default as is recommended. 
+
 ### addCommand(commandName, commandResponse, [autoDelete])
 commandName = What the bot responds too (after prefix).
 
