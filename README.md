@@ -31,6 +31,9 @@ Adds a prefix to the list, adding multiple prefix' does work
 ### setMentionPrefix(boolean)
 Sets whether or not the bot will treat it's mention as a prefix (Ex: responds to `@Bot Mention commandname`)
 
+## setStatus(type, game)
+Sets status. Type = 'playing'/'streaming'/'listening'/'watching'. And game is the text after said type.
+
 ### addCommand(commandName, commandResponse, [autoDelete])
 commandName = What the bot responds too (after prefix).
 
