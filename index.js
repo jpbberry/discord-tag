@@ -1,5 +1,12 @@
 const Client = require("discord-no-cache");
 
+const types = {
+    playing: 0,
+    streaming: 1,
+    listening: 2,
+    watching: 3
+}
+
 class TagBot {
     constructor() {
         this.debugFN = () => {};
@@ -9,6 +16,7 @@ class TagBot {
         this.user = "";
         
         this.commands = new Map();
+        this.status = null
         
         this.log = () => {};
     }
@@ -21,6 +29,13 @@ class TagBot {
         if(bool) this.mentionPrefix = true
         else this.mentionPrefix = false
         return this;
+    }
+    setStatus(type, game) {
+        this.status = {
+            type: type,
+            game: game
+        }
+        return this
     }
     
     addCommand(commandName, commandResponse, autoDelete) {
@@ -89,6 +104,15 @@ class TagBot {
         this.client.on("READY", (data) => {
             this.user = data.user;
             this.log(`Logged in as ${data.user.username}#${data.user.discriminator}`);
+            
+            if (this.status) {
+                this.client.setStatus({
+                    game: {
+                        type: types[this.status.type.toLowerCase()],
+                        name: this.status.game
+                    }
+                })
+            }
         })
         
         this.client.start();
