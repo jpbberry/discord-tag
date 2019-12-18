@@ -69,17 +69,20 @@ class TagBot {
     setup() {
         this.client.on("MESSAGE_CREATE", (message) => {
             message.content = message.content.toLowerCase();
-            let prefix;
             let prefixes = this.prefix;
             if(this.mentionPrefix) prefixes = [...prefixes, ...[`<@${this.user.id}> `, `<@!${this.user.id}> `]];
-            for(let i in prefixes) {
-                if(message.content.startsWith(prefixes[i])) {
-                    prefix = prefixes[i];
-                    break;
-                } else continue;
-            }
+			let space = false
+			const prefix = ([
+				...this.prefix,
+				...(this.mentionPrefix ? [`<@${this.user.id}>`, `<@!${this.user.id}>`] : [])
+			].find(prefix => {
+				if (message.content.startsWith(prefix)) {
+					if (prefix.startsWith("<@")) space = true
+					return true
+				}
+			}))
             if(!prefix) return;
-            var commandName = message.content.slice(prefix.length);
+            var commandName = message.content.slice(`${prefix}${space ? " " : ""}`.length);
             
             this.runCommand(commandName, message);
         })
