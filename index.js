@@ -1,5 +1,4 @@
 const Client = require("discord-no-cache");
-
 const types = {
     playing: 0,
     streaming: 1,
@@ -18,7 +17,7 @@ class TagBot {
         
         this.user = "";
         
-        this.commands = new Map();
+        this.commands = [];
         
         this.log = () => {};
     }
@@ -45,12 +44,12 @@ class TagBot {
     }
     
     addCommand(commandName, commandResponse, autoDelete) {
-        this.commands.set(commandName, {res: commandResponse, del: autoDelete});
+        this.commands.push({name: commandName, res: commandResponse, del: autoDelete});
         return this;
     }
     runCommand(commandName, message) {
         if(!this.allowBots && message.author.bot) return
-        let response = this.commands.get(commandName);
+        let response = this.commands.find(cmd => cmd.name === commandName || (cmd.name instanceof RegExp && commandName.match(cmd.name)));
         if(!response || !response.res) return;
         this.log(`${message.author.username}#${message.author.discriminator} ran command: ${commandName}`);
         if((typeof response.res) == "function") response.res(message, this.bindMessage(message.channel_id));
@@ -91,8 +90,6 @@ class TagBot {
     setup() {
         this.client.on("MESSAGE_CREATE", (message) => {
             message.content = message.content.toLowerCase();
-            let prefixes = this.prefix;
-            if(this.mentionPrefix) prefixes = [...prefixes, ...[`<@${this.user.id}> `, `<@!${this.user.id}> `]];
 			let space = false
 			const prefix = ([
 				...this.prefix,
@@ -104,7 +101,9 @@ class TagBot {
 				}
 			}))
             if(!prefix) return;
-            var commandName = message.content.slice(`${prefix}${space ? " " : ""}`.length);
+            const messagePart = message.content.slice(`${prefix}${space ? " " : ""}`.length).split(' ');
+            const commandName = messagePart[0]
+            message.args = messagePart.slice(1)
             
             this.runCommand(commandName, message);
         })
