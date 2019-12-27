@@ -1,4 +1,5 @@
 const Client = require("discord-no-cache");
+const Embed = require("discord-no-cache/Embed")
 const types = {
     playing: 0,
     streaming: 1,
@@ -9,6 +10,7 @@ const types = {
 class TagBot {
     constructor() {
         this.debugFN = () => {};
+        this.readyFN = () => {};
         
         this.prefix = [];
         this.mentionPrefix = false;
@@ -20,6 +22,10 @@ class TagBot {
         this.commands = [];
         
         this.log = () => {};
+    }
+    
+    get embed() {
+        return new Embed()
     }
 
     addPrefix(prefix) {
@@ -53,7 +59,7 @@ class TagBot {
         if(!response || !response.res) return;
         this.log(`${message.author.username}#${message.author.discriminator} ran command: ${commandName}`);
         if((typeof response.res) == "function") response.res(message, this.bindMessage(message.channel_id));
-        else this.client.send(message.channel_id, this.resolveCommand(response.res, message));
+        else this.client.send(message.channel_id, typeof response.res === 'string' ? this.resolveCommand(response.res, message) : response.res);
         if(response.del) this.client.deleteMessage(message.channel_id, message.id).catch(()=>{});
     }
     resolveCommand(content, message) {
@@ -63,7 +69,7 @@ class TagBot {
     
     bindMessage(channelID) {
         return (content) => {
-            this.client.send(channelID, content);
+            return this.client.send(channelID, content);
         }
     }
     
@@ -74,6 +80,11 @@ class TagBot {
     setLog(fn) {
         this.log = fn;
         return this;
+    }
+    
+    ready(fn) {
+        this.readyFN = fn;
+        return this
     }
     
     login(token, extraopts) {
@@ -89,7 +100,7 @@ class TagBot {
     
     setup() {
         this.client.on("MESSAGE_CREATE", (message) => {
-            message.content = message.content.toLowerCase();
+            // message.content = message.content.toLowerCase();
 			let space = false
 			const prefix = ([
 				...this.prefix,
@@ -108,6 +119,7 @@ class TagBot {
             this.runCommand(commandName, message);
         })
         this.client.on("READY", (data) => {
+            this.readyFN(data)
             this.user = data.user;
             this.log(`Logged in as ${data.user.username}#${data.user.discriminator}`);
             
