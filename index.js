@@ -1,5 +1,5 @@
-const Client = require("discord-no-cache");
-const Embed = require("discord-no-cache/Embed")
+const Client = require("C:/Workspace/lib/discord-no-cache");
+const Embed = require("C:/Workspace/lib/discord-no-cache/Embed")
 const types = {
     playing: 0,
     streaming: 1,
